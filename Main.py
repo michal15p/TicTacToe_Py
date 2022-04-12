@@ -1,34 +1,33 @@
 import pygame
 from pygame import *
-
+import random
 
 def draw_menu(h, w, surface, background):
     test = 123, 123, 123
     surface.fill(background)
-    surface.blit(font.render("---Tic Tac Toe---", False, (0, 0, 0)), (w * 0.2, w * 0.2))
+    surface.blit(font.render("---Tic Tac Toe---", False, (0, 0, 0)), (w * 0.2, h * 0.2))
 
-    pygame.draw.rect(surface, test, (h * 0.2, w * 0.3, h * 0.4, w * 0.05))
+    pygame.draw.rect(surface, test, (w * 0.2, h * 0.3, w * 0.4, h * 0.05))
     surface.blit(font.render("Player vs Player", False, (0, 0, 0)), (w * 0.2, h * 0.3))
 
-    pygame.draw.rect(surface, test, (h * 0.2, w * 0.4, h * 0.4, w * 0.05))
+    pygame.draw.rect(surface, test, (w * 0.2, h * 0.4, w * 0.4, h * 0.05))
     surface.blit(font.render("Player vs Computer - easy", False, (0, 0, 0)), (w * 0.2, h * 0.4))
 
-    pygame.draw.rect(surface, test, (h * 0.2, w * 0.5, h * 0.4, w * 0.05))
+    pygame.draw.rect(surface, test, (w * 0.2, h * 0.5, w * 0.4, h * 0.05))
     surface.blit(font.render("Player vs Computer - hard", False, (0, 0, 0)), (w * 0.2, h * 0.5))
 
-    pygame.draw.rect(surface, test, (h * 0.2, w * 0.6, h * 0.4, w * 0.05))
+    pygame.draw.rect(surface, test, (w * 0.2, h * 0.6, w * 0.4, h * 0.05))
     surface.blit(font.render("Exit", False, (0, 0, 0)), (w * 0.2, h * 0.6))
     pygame.display.flip()
 
-
 def op_menu(h, w, poz):
-    if h * 0.200 <= poz[0] < h * 0.600 and w * 0.300 <= poz[1] < w * 0.350:
+    if w * 0.200 <= poz[0] < w * 0.600 and h * 0.300 <= poz[1] < h * 0.350:
         return 0
-    if h * 0.200 <= poz[0] < h * 0.600 and w * 0.400 <= poz[1] < w * 0.450:
+    if w * 0.200 <= poz[0] < w * 0.600 and h * 0.400 <= poz[1] < h * 0.450:
         return 1
-    if h * 0.200 <= poz[0] < h * 0.600 and w * 0.500 <= poz[1] < w * 0.550:
+    if w * 0.200 <= poz[0] < w * 0.600 and h * 0.500 <= poz[1] < h * 0.550:
         return 2
-    if h * 0.200 <= poz[0] < h * 0.600 and w * 0.600 <= poz[1] < w * 0.650:
+    if w * 0.200 <= poz[0] < w * 0.600 and h * 0.600 <= poz[1] < h * 0.650:
         return 3
 
 
@@ -128,7 +127,6 @@ def pvsP(height, screen, font, black, background):
     turn = 1
     map(height, screen, black, background)
     results = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-    pygame.time.set_timer(pygame.USEREVENT, 1000)
     running_pvsp = True
     end = False
     while running_pvsp:
@@ -168,7 +166,7 @@ def pvsP(height, screen, font, black, background):
                                     results[2] == results[4] == results[6] == -1):
                                 screen.blit(font.render("Winner: Player 2 - click PPM to return", False, (0, 0, 0)), (0, 0))
                                 end = True
-                            if 0 not in results:
+                            if 0 not in results and end is False:
                                 screen.blit(font.render("Tie - click PPM to return", False, (0, 0, 0)), (0, 0))
                                 end = True
                                 # screen.fill(background)
@@ -178,9 +176,72 @@ def pvsP(height, screen, font, black, background):
                     draw_menu(height, width, screen, background)
         pygame.display.flip()
 
+def pvsEC(height, screen, font, black, background, object):
+    turn = 1
+    map(height, screen, black, background)
+    results = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    running_pvsp = True
+    end = False
+    while running_pvsp:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                # sys.exit()
+                running_pvsp = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if object == turn:
+                    if event.button == 1:
+                        poz = pygame.mouse.get_pos()
+                        num_field = check(height, poz)
+                        if num_field is not None:
+                            if results[num_field] == 0 and num_field is not None:
+                                draw_object(height, screen, black, turn, num_field)
+                                results[num_field] = turn
+                                if ((results[0] == results[3] == results[6] == turn) or (
+                                        results[1] == results[4] == results[7] == turn) or
+                                        (results[2] == results[5] == results[8] == turn) or (
+                                        results[0] == results[1] == results[2] == turn) or
+                                        (results[3] == results[4] == results[5] == turn) or (
+                                        results[6] == results[7] == results[8] == turn) or
+                                        (results[0] == results[4] == results[8] == turn) or (
+                                        results[2] == results[4] == results[6] == turn)) and end is False:
+                                    screen.blit(font.render("Winner: Player 1 - click PPM to return", False, (0, 0, 0)), (0, 0))
+                                    end = True
+                                if 0 not in results and end is False:
+                                    screen.blit(font.render("Tie - click PPM to return", False, (0, 0, 0)), (0, 0))
+                                    end = True
+                                    # screen.fill(background)
+                                turn = -turn
+                    elif event.button == 3 and end == True:
+                        running_pvsp = False
+                        draw_menu(height, width, screen, background)
+                elif object != turn:
+                    if event.button == 1:
+                        num_field = random.randint(0, 8)
+                        if 0 in results:
+                            while results[num_field] != 0:
+                                num_field = random.randint(0, 8)
+                        if results[num_field] == 0:
+                            draw_object(height, screen, black, turn, num_field)
+                            results[num_field] = turn
+                            if ((results[0] == results[3] == results[6] == turn) or (
+                                    results[1] == results[4] == results[7] == turn) or
+                                    (results[2] == results[5] == results[8] == turn) or (
+                                    results[0] == results[1] == results[2] == turn) or
+                                    (results[3] == results[4] == results[5] == turn) or (
+                                    results[6] == results[7] == results[8] == turn) or
+                                    (results[0] == results[4] == results[8] == turn) or (
+                                    results[2] == results[4] == results[6] == turn)) and end is False:
+                                screen.blit(font.render("Winner: Computer - click PPM to return", False, (0, 0, 0)), (0, 0))
+                                end = True
+                            turn = -turn
+                    elif event.button == 3 and end == True:
+                        running_pvsp = False
+                        draw_menu(height, width, screen, background)
+
+        pygame.display.flip()
 
 pygame.init()
-size = width, height = 1000, 1000
+size = width, height = 1800, 1000
 screen = pygame.display.set_mode(size)
 font = pygame.font.SysFont('Comic Sans MS', 30)
 black = 0, 0, 0
@@ -196,5 +257,9 @@ while running_menu:
             choose = op_menu(height, width, poz)
             if choose == 0:
                 pvsP(height, screen, font, black, background)
+            if choose == 1:
+                pvsEC(height, screen, font, black, background, 1)
+            if choose == 3:
+                running_menu = False
 
     pygame.display.flip()
